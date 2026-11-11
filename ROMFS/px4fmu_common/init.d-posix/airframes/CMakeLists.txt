@@ -77,6 +77,8 @@ px4_add_romfs_files(
 	4005_gz_x500_vision
 	4006_gz_px4vision
 	4008_gz_advanced_plane
+	4098_gz_allen_glider_heron
+	4099_gz_allen_glider
 	4009_gz_r1_rover
 	4010_gz_x500_mono_cam
 	4011_gz_lawnmower

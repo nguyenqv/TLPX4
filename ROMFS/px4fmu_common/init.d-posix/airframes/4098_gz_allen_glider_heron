@@ -1,0 +1,96 @@
+#!/bin/sh
+#
+# @name Gazebo Allen-SG hardware glider (1.85 kg, 2.4 m span)
+# @type Fixedwing
+#
+# For the allen_glider_heron model of the Allen-SG thermal soaring package: the airframe
+# and parts of the package's HARDWARE.md. Same actuators and control allocation as
+# 4099_gz_allen_glider. Airspeeds and sink rates follow tools/glider_polar.py for that
+# model; feed-forward gains are scaled from 4099 by span, chord, speed and the ratio of
+# damping to control power.
+# Motor: full throttle is 9 N, an estimate of the 12x6 folding propeller's thrust at
+# 10 m/s on 3S (the motor model has no thrust loss with airspeed). The propeller folds and
+# the speed controller brakes, so minimum throttle is zero.
+# Flown in gz SITL with these values (STATUS.md of the package); the gains are not tuned.
+#
+
+. ${R}etc/init.d/rc.fw_defaults
+
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=allen_glider_heron}
+
+param set-default SIM_GZ_EN 1
+
+param set-default FW_LND_ANG 8
+
+param set-default FW_PR_FF 0.11
+param set-default FW_PR_I 0.3
+param set-default FW_PR_P 0.08
+
+param set-default FW_RR_FF 0.11
+param set-default FW_RR_I 0.2
+param set-default FW_RR_P 0.03
+
+param set-default FW_YR_FF 0.34
+# No integrator on the rudder: in a turn the yaw rate follows the bank, the rudder cannot
+# remove the small difference from PX4's setpoint, and with 0.4 the integrator sat at its
+# limit: 15-23 % rudder and 2-4 deg of sideslip in every circle.
+param set-default FW_YR_I 0.0
+param set-default FW_YR_P 0.2
+
+param set-default FW_PSP_OFF 2
+param set-default FW_P_LIM_MAX 32
+param set-default FW_P_LIM_MIN -15
+
+param set-default FW_SPOILERS_LND 0.4
+
+# Model: stall 8.3 m/s, best glide 9.7 m/s, sink 0.61 m/s at 10.5 m/s.
+param set-default FW_AIRSPD_STALL 7.9
+param set-default FW_AIRSPD_MIN 9.0
+param set-default FW_AIRSPD_TRIM 10.0
+param set-default FW_AIRSPD_MAX 18
+
+# About 1.0 N of drag at trim. Thrust goes with the square of the throttle: 1.0 N at 33 %,
+# 3.8 N at 65 % (a climb of 1.5 m/s), 9 N at 100 %.
+param set-default FW_THR_MIN 0.0
+param set-default FW_THR_TRIM 0.33
+param set-default FW_THR_MAX 1.0
+
+param set-default FW_T_CLMB_R_SP 2.5
+# PX4 sets the throttle for a climb in proportion between trim and this. 3.5 gave 62 % for
+# 1.5 m/s where 65 % is needed, and the motor climbs were flown 0.6 m/s slow.
+param set-default FW_T_CLMB_MAX 3.0
+param set-default FW_T_SINK_MAX 2.5
+param set-default FW_T_SINK_MIN 0.65
+
+param set-default FW_W_EN 1
+
+param set-default NAV_DLL_ACT 2
+
+param set-default RWTO_TKOFF 1
+
+param set-default CA_ROTOR_COUNT 1
+
+param set-default CA_SV_CS_COUNT 6
+param set-default CA_SV_CS0_TRQ_R -0.5
+param set-default CA_SV_CS0_TYPE 1
+param set-default CA_SV_CS1_TRQ_R 0.5
+param set-default CA_SV_CS1_TYPE 2
+param set-default CA_SV_CS2_TRQ_P 1
+param set-default CA_SV_CS2_TYPE 3
+param set-default CA_SV_CS3_TRQ_Y 1
+param set-default CA_SV_CS3_TYPE 4
+param set-default CA_SV_CS4_TYPE 9
+param set-default CA_SV_CS5_TYPE 10
+
+param set-default SIM_GZ_EC_FUNC1 101
+param set-default SIM_GZ_EC_MIN1 10
+param set-default SIM_GZ_EC_MAX1 1026
+
+param set-default SIM_GZ_SV_FUNC1 201
+param set-default SIM_GZ_SV_FUNC2 202
+param set-default SIM_GZ_SV_FUNC3 203
+param set-default SIM_GZ_SV_FUNC4 204
+param set-default SIM_GZ_SV_FUNC5 205
+param set-default SIM_GZ_SV_FUNC6 206
